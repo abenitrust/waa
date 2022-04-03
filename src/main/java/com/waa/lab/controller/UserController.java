@@ -1,6 +1,7 @@
 package com.waa.lab.controller;
 
-import com.waa.lab.domain.User;
+import com.waa.lab.annotation.ExecutionTime;
+import  com.waa.lab.domain.User;
 import com.waa.lab.domain.dto.UserDto;
 import com.waa.lab.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,6 +27,7 @@ public class UserController {
         return userService.getAll();
     }
 
+    @ExecutionTime
     @GetMapping("/{id}")
     public User getById(@PathVariable long id) {
         return userService.getById(id);
