@@ -1,8 +1,7 @@
 package com.waa.lab.aop;
 
 import com.waa.lab.domain.Log;
-import com.waa.lab.helper.Factory;
-import com.waa.lab.service.ILogService;
+import com.waa.lab.service.LogService;
 import org.aspectj.lang.ProceedingJoinPoint;
 import org.aspectj.lang.annotation.Around;
 import org.aspectj.lang.annotation.Aspect;
@@ -11,16 +10,15 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
 
 import java.time.LocalDate;
-import java.time.LocalTime;
 
 @Aspect
 @Configuration
 public class LoggerAop {
 
-    private ILogService logService;
+    private LogService logService;
 
     @Autowired
-    public LoggerAop(ILogService logService) {
+    public LoggerAop(LogService logService) {
         this.logService = logService;
     }
 

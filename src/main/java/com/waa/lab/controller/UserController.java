@@ -3,7 +3,7 @@ package com.waa.lab.controller;
 import com.waa.lab.annotation.ExecutionTime;
 import  com.waa.lab.domain.User;
 import com.waa.lab.domain.dto.UserDto;
-import com.waa.lab.service.IUserService;
+import com.waa.lab.service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +14,10 @@ import java.util.List;
 @RequestMapping("/api/v1/users")
 public class UserController {
 
-    private IUserService userService;
+    private UserService userService;
 
     @Autowired
-    public UserController(IUserService userService) {
+    public UserController(UserService userService) {
         this.userService = userService;
     }
 

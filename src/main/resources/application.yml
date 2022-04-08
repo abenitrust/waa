@@ -18,5 +18,8 @@ spring:
   sql:
     init:
       mode: always
+jwt:
+  secret: "waa_lab_jwt_secrete_code"
+  token_expiration_ms: 900000 # 15 minutes
 server:
   port: 8080

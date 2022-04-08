@@ -4,6 +4,7 @@ import com.waa.lab.domain.User;
 import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.CrudRepository;
 
+import javax.swing.text.html.Option;
 import java.util.List;
 import java.util.Optional;
 
@@ -18,4 +19,7 @@ public interface UserRepository extends CrudRepository<User, Long> {
 
     @Query("select u from User u Join u.posts p where p.title = :title")
     List<User> findByPostTitle(String title);
+
+    Optional<User> findByUsername(String username);
+    Optional<User> findByEmail(String email);
 }
