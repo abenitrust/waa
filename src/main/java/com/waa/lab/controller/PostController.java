@@ -2,8 +2,8 @@ package com.waa.lab.controller;
 
 import com.waa.lab.domain.Post;
 import com.waa.lab.domain.dto.PostDto;
-import com.waa.lab.service.IPostService;
 import com.waa.lab.service.PostService;
+import com.waa.lab.service.impl.PostServiceImpl;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +14,10 @@ import java.util.List;
 @RequestMapping("/api/v1/posts")
 public class PostController {
 
-    private IPostService postService;
+    private PostService postService;
 
     @Autowired
-    public PostController(PostService postService) {
+    public PostController(PostServiceImpl postService) {
         this.postService = postService;
     }
 

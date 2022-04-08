@@ -1,9 +1,8 @@
 package com.waa.lab.controller;
 
 import com.waa.lab.domain.Comment;
-import com.waa.lab.domain.Post;
 import com.waa.lab.domain.dto.CommentDto;
-import com.waa.lab.service.ICommentService;
+import com.waa.lab.service.CommentService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.web.bind.annotation.*;
@@ -14,10 +13,10 @@ import java.util.List;
 @RequestMapping("/api/v1/comments")
 public class CommentController {
 
-    private ICommentService commentService;
+    private CommentService commentService;
 
     @Autowired
-    public CommentController(ICommentService commentService) {
+    public CommentController(CommentService commentService) {
         this.commentService = commentService;
     }
 

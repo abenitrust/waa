@@ -1,7 +1,7 @@
 package com.waa.lab.controller;
 
 import com.waa.lab.domain.Log;
-import com.waa.lab.service.ILogService;
+import com.waa.lab.service.LogService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -12,10 +12,10 @@ import java.util.List;
 @RestController
 @RequestMapping("/api/v1/logs")
 public class LogController {
-    private ILogService logService;
+    private LogService logService;
 
     @Autowired
-    public LogController(ILogService logService) {
+    public LogController(LogService logService) {
         this.logService = logService;
     }
 
