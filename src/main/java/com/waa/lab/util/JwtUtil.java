@@ -14,15 +14,23 @@ public class JwtUtil {
     @Value("${jwt.secret}")
     private String secret;
 
-    @Value("${jwt.token_expiration_ms}")
-    private long expiration;
+    @Value("${jwt.access_token_expiration_ms}")
+    private long accessTokenexpiration;
+
+    @Value("${jwt.refresh_token_expiration_ms}")
+    private long refreshTokenExpiration;
 
     public String generateToken(UserDetails userDetails) {
         Map<String, Object> claims = new HashMap<>();
-        return doGenerateToken(claims, userDetails.getUsername());
+        return buildToken(claims, userDetails.getUsername(), accessTokenexpiration);
     }
 
-    public String doGenerateToken(Map<String, Object> claims, String subject) {
+    public String generateAccessToken(String subject) {
+        return buildToken(subject, accessTokenexpiration);
+    }
+
+    public String buildToken(Map<String, Object> claims,
+                                String subject, long expiration) {
         return Jwts.builder()
                 .setClaims(claims)
                 .setSubject(subject)
@@ -32,7 +40,7 @@ public class JwtUtil {
                 .compact();
     }
 
-    public String doGenerateToken(String subject) {
+    public String buildToken(String subject, long expiration) {
         return Jwts.builder()
                 .setSubject(subject)
                 .setIssuedAt(new Date())
@@ -42,7 +50,7 @@ public class JwtUtil {
     }
 
     public String generateRefreshToken(String subject) {
-        return doGenerateToken(subject);
+        return buildToken(subject, refreshTokenExpiration);
     }
 
     public String getSubject(String token) {

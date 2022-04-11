@@ -20,6 +20,7 @@ spring:
       mode: always
 jwt:
   secret: "waa_lab_jwt_secrete_code"
-  token_expiration_ms: 900000 # 15 minutes
+  access_token_expiration_ms: 60000 # 15 minutes
+  refresh_token_expiration_ms: 604800000 # 7 days
 server:
   port: 8080
