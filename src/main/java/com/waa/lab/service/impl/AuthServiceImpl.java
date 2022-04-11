@@ -1,14 +1,16 @@
 package com.waa.lab.service.impl;
 
-import com.waa.lab.domain.Role;
-import com.waa.lab.domain.RoleEnum;
-import com.waa.lab.domain.User;
+import com.waa.lab.domain.*;
 import com.waa.lab.domain.dto.request.LoginRequestDto;
+import com.waa.lab.domain.dto.request.RefreshTokenRequestDto;
 import com.waa.lab.domain.dto.request.RegisterRequestDto;
 import com.waa.lab.domain.dto.response.LoginResponseDto;
 import com.waa.lab.domain.dto.response.MessageResponseDto;
+import com.waa.lab.domain.dto.response.RefreshTokenResponseDto;
 import com.waa.lab.exception.InvalidRoleException;
 import com.waa.lab.exception.NewUserException;
+import com.waa.lab.exception.RefreshTokenException;
+import com.waa.lab.repository.RefreshTokenRepository;
 import com.waa.lab.repository.RoleRepository;
 import com.waa.lab.repository.UserRepository;
 import com.waa.lab.service.AuthService;
@@ -39,11 +41,12 @@ public class AuthServiceImpl implements AuthService {
     private ModelMapper modelMapper;
     private RoleRepository roleRepository;
     private PasswordEncoder passwordEncoder;
+    private RefreshTokenRepository refreshTokenRepository;
 
     @Autowired
     public AuthServiceImpl(AuthenticationManager authenticationManager,
                            UserDetailsService userDetailsService,
-                           JwtUtil jwtUtil, UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder) {
+                           JwtUtil jwtUtil, UserRepository userRepository, ModelMapper modelMapper, RoleRepository roleRepository, PasswordEncoder passwordEncoder, RefreshTokenRepository refreshTokenRepository) {
         this.authenticationManager = authenticationManager;
         this.userDetailsService = userDetailsService;
         this.jwtUtil = jwtUtil;
@@ -51,6 +54,7 @@ public class AuthServiceImpl implements AuthService {
         this.modelMapper = modelMapper;
         this.roleRepository = roleRepository;
         this.passwordEncoder = passwordEncoder;
+        this.refreshTokenRepository = refreshTokenRepository;
     }
 
     @Override
@@ -63,7 +67,7 @@ public class AuthServiceImpl implements AuthService {
                     loginRequest.getPassword()
             );
             Authentication authentication = authenticationManager.authenticate(uT);
-            UserDetails userDetails = userDetailsService.loadUserByUsername(
+            AppUserDetails userDetails = (AppUserDetails) userDetailsService.loadUserByUsername(
                     loginRequest.getUsername()
             );
 
@@ -73,6 +77,16 @@ public class AuthServiceImpl implements AuthService {
                     .map(role -> role.getAuthority())
                     .collect(Collectors.toList());
 
+            // persist refreshToken
+            RefreshToken storedToken = refreshTokenRepository.findByUserId(userDetails.getId())
+                    .orElse(null);
+
+            if(storedToken == null) {
+                storedToken = new RefreshToken();
+            }
+            storedToken.setUser(userRepository.findById(userDetails.getId()).orElse(null));
+            storedToken.setToken(refreshToken);
+            refreshTokenRepository.save(storedToken);
             SecurityContextHolder.getContext().setAuthentication(authentication);
 
             return new LoginResponseDto(accessToken, refreshToken, roles);
@@ -123,4 +137,28 @@ public class AuthServiceImpl implements AuthService {
 
         return new MessageResponseDto("User account successfully created");
     }
+
+    @Override
+    public RefreshTokenResponseDto refreshToken(RefreshTokenRequestDto requestTokenDto)
+            throws RefreshTokenException {
+        String userToken = requestTokenDto.getRefreshToken();
+        RefreshToken storedToken = refreshTokenRepository.findByToken(userToken)
+                .orElse(null);
+        if(storedToken == null || !storedToken.getToken().equals(userToken)) {
+            throw new RefreshTokenException("Invalid refresh token");
+        }
+
+        if(!jwtUtil.validateToken(userToken)) {
+            throw new RefreshTokenException("Token has expired and session has ended. Please login again");
+        }
+
+        String subject = jwtUtil.getSubject(userToken);
+        String newAccessToken = jwtUtil.generateAccessToken(subject);
+        String newRefreshToken = jwtUtil.generateRefreshToken(subject);
+        storedToken.setToken(newRefreshToken);
+        refreshTokenRepository.save(storedToken);
+        return new RefreshTokenResponseDto(newAccessToken, newRefreshToken);
+    }
+
+
 }
